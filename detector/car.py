@@ -1,4 +1,6 @@
+from distutils.command.config import config
 import cv2
+from config import config
 
 class CarDetector():
     """Car Detector class which detects the presence of vehicles (cars) in an image utilizing YOLOv4.
@@ -7,8 +9,8 @@ class CarDetector():
         
     """
     def __init__(self):
-
-        net = cv2.dnn.readNet('dnn_model/yolov4.weights','dnn_model/yolov4.cfg')
+        
+        net = cv2.dnn.readNet(config.WEIGHTS, config.CFG)
         self.model = cv2.dnn_DetectionModel(net)
         self.model.setInputParams(size=(732, 732), scale=1/255)
         # 2-car, 5-bus, 7-van
