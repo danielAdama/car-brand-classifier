@@ -1,0 +1,45 @@
+# Use the latest 2.1 version of CircleCI pipeline process engine.
+# See: https://circleci.com/docs/2.0/configuration-reference
+version: 2.1
+
+# Define a job to be invoked later in a workflow.
+# See: https://circleci.com/docs/2.0/configuration-reference/#jobs
+jobs:
+  build:
+    docker:
+      - image: cimg/python:3.10.4
+    steps:
+      - checkout
+
+      # Download and cache dependencies
+      - restore_cache:
+          key: v1-dependencies-{{ checksum "requirements.txt" }}
+      - run:
+          name: Install Dependencies
+          command: |
+            python3 -m venv car_env 
+            source car_env/bin/activate
+            pip install -r requirements.txt
+      - save_cache:
+          paths:
+          - "./car_env"
+          key: v1-dependencies-{{ checksum "requirements.txt" }}
+        
+      # - run:
+      #     name: Install nltk data
+      #     command: |
+      #       source sentiment_env/bin/activate
+      #       python -m nltk.downloader wordnet punkt averaged_perceptron_tagger omw-1.4
+          
+      - run:
+          name: Run Test
+          command: |
+            source car_env/bin/activate
+            pytest -v
+# Invoke jobs via workflows
+# See: https://circleci.com/docs/2.0/configuration-reference/#workflows
+workflows:
+  sentiment_test: # This is the name of the workflow, feel free to change it to better match your workflow.
+    # Inside the workflow, you define the jobs you want to run.
+    jobs:
+      - build
