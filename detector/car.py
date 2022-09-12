@@ -23,7 +23,7 @@ class CarDetector():
     def vehicle_detected(self, frame):
         car_boxes = []
         class_ids, confidences, boxes = self.model.detect(frame, nmsThreshold=0.4)
-        for class_, confidence, box in zip(class_ids, confidences, boxes):
+        for class_id, confidence, box in zip(class_ids, confidences, boxes):
             # Skip detections with low confidence
             if (confidence < 0.82):
                 continue
