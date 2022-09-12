@@ -24,12 +24,6 @@ jobs:
           paths:
           - "./car_env"
           key: v1-dependencies-{{ checksum "requirements.txt" }}
-        
-      # - run:
-      #     name: Install nltk data
-      #     command: |
-      #       source sentiment_env/bin/activate
-      #       python -m nltk.downloader wordnet punkt averaged_perceptron_tagger omw-1.4
           
       - run:
           name: Run Test
@@ -42,4 +36,4 @@ workflows:
   car_test: # This is the name of the workflow, feel free to change it to better match your workflow.
     # Inside the workflow, you define the jobs you want to run.
     jobs:
-      - build
+      - test
