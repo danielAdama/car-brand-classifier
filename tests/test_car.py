@@ -3,8 +3,6 @@ import imutils
 import numpy as np
 import cv2
 import os
-import sys
-sys.path.append('/home/daniel/Desktop/programming/pythondatascience/datascience/computerVision/car-brand-classifier')
 from detector.car import CarDetector
 
 def test_car():
