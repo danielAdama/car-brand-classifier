@@ -17,7 +17,7 @@ import imutils
 
 t1 = time.time()
 app = Flask(__name__)
-os.environ['FLASK_DEBUG']="development"
+os.environ['FLASK_ENV']="development"
 cd = CarDetector(weight='yolov4.weights', cfg='yolov4.cfg')
 
 
@@ -25,22 +25,19 @@ cd = CarDetector(weight='yolov4.weights', cfg='yolov4.cfg')
 def detect():
 
     if not request.method == "POST":
-        return 
+        return
 
     if request.files.get("image"):
         image_file = request.files["image"]
         image_bytes = image_file.read()
-        img = Image.open(io.BytesIO(image_bytes)).convert('RGB')
-        open_cv_image = np.array(img)
+        img = np.array(Image.open(io.BytesIO(image_bytes)).convert('RGB'))
+        t2 = time.time()
+        print(t2-t1)
         # Convert RGB to BGR 
-        open_cv_image = open_cv_image[:, :, ::-1].copy()
-        print(open_cv_image)
-        print(type(open_cv_image))
-        frame = imutils.resize(open_cv_image, 900)
+        cv_image = img[:, :, ::-1].copy()
+        frame = imutils.resize(cv_image, 900)
         (height, width) = frame.shape[:2]
-        image = cv2.resize(open_cv_image, (width, height))
-        # print(image)
-        # print(image.shape)
+        image = cv2.resize(cv_image, (width, height))
         scores, boxes = cd.vehicle_detected(image)
 
         output = {}
@@ -62,8 +59,8 @@ def detect():
                 output['detections']['prediction'].append(detection)
         else:
             output['detections'] = "No Car detected"
-        t2 = time.time()
-        print(t2-t1)
+        # t2 = time.time()
+        # print(t2-t1)
     return pd.Series(output).to_json(), 200
 
 if __name__ == "__main__":
