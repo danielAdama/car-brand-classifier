@@ -3,16 +3,18 @@ from config import config
 import os
 
 class CarDetector():
-    """Car Detector class which detects the presence of vehicles (cars) in an image utilizing YOLOv4.
+    """Car Detector class which detects the presence of vehicles (cars) in an frame utilizing YOLOv4.
     
     Attributes:
         
     """
-    def __init__(self, weight = "yolov4-tiny.weights", cfg = "yolov4-tiny.cfg"):
+    def __init__(self, weight = "yolov4.weights", cfg = "yolov4.cfg"):
 
         net = cv2.dnn.readNet(
-            os.path.join(os.getcwd(),f"dnn_model/{weight}"),
-            os.path.join(os.getcwd(),f"dnn_model/{cfg}"))
+            # os.path.join(os.getcwd(),f"dnn_model/{weight}"),
+            # os.path.join(os.getcwd(),f"dnn_model/{cfg}"))
+            os.path.join(config.BASEPATH, f"dnn_model\{weight}"),
+            os.path.join(config.BASEPATH, f"dnn_model\{cfg}"))
         
         self.model = cv2.dnn_DetectionModel(net)
         self.model.setInputParams(size=(732, 732), scale=1/255.0)
@@ -22,6 +24,7 @@ class CarDetector():
     
     def vehicle_detected(self, frame):
         car_boxes = []
+        confi = []
         class_ids, confidences, boxes = self.model.detect(frame, nmsThreshold=0.4)
         for class_id, confidence, box in zip(class_ids, confidences, boxes):
             # Skip detections with low confidence
@@ -29,5 +32,6 @@ class CarDetector():
                 continue
             if (class_id == self.classe_allowed):
                 car_boxes.append(box)
+                confi.append(f"{confidence*100:.1f}%")
         
-        return car_boxes
+        return confi, car_boxes
