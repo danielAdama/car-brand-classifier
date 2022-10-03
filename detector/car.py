@@ -11,11 +11,9 @@ class CarDetector():
     def __init__(self, weight = "yolov4.weights", cfg = "yolov4.cfg"):
 
         net = cv2.dnn.readNet(
-            # os.path.join(os.getcwd(),f"dnn_model\{weight}"),
-            # os.path.join(os.getcwd(),f"dnn_model\{cfg}"))
-            os.path.join(config.BASEPATH, f"dnn_model\{weight}"),
-            os.path.join(config.BASEPATH, f"dnn_model\{cfg}"))
-        
+            os.path.join(os.getcwd(),f"dnn_model\{weight}"),
+            os.path.join(os.getcwd(),f"dnn_model\{cfg}"))
+            
         self.model = cv2.dnn_DetectionModel(net)
         self.model.setInputParams(size=(732, 732), scale=1/255.0)
         # 2-car, 5-bus, 7-van
