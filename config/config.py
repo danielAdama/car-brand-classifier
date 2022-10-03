@@ -1,9 +1,10 @@
 import os 
 import cv2
 
-EXAMPLE_IMGS = 'examples'
+EXAMPLE_IMGS = r'C:/Users/Dell/Desktop/programming/computerVision/car-brand-classifier/examples'
 VIDEO = 'Traffic.mp4'
-DATAPATH = "/home/daniel/Desktop/programming/pythondatascience/datascience/computerVision/dataset/car_brand/custome_data"
+BASEPATH = r'C:\Users\DELL\Desktop\programming\computerVision\car-brand-classifier'
+# DATAPATH = r"C:/Users/Dell/Desktop/programming/computerVision/dataset/car_brand/custome_data"
 # BASEPATH = "/home/daniel/Desktop/programming/pythondatascience/datascience/computerVision/dataset/car_brand/custome_new"
 BRAND_NAMES = ["Audi", "BMW", "Toyota", "Mercedes", "Lexus", "Honda"]
 NUM_IMAGES_TO_SCRPE = 80
