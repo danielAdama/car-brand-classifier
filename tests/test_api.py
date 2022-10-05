@@ -3,8 +3,5 @@ import requests
 import os
 
 
-def test_api_post_image_endpoint():
-    url = 'http://localhost:8080/v1/image'
-    response = requests.post(url, files={'image': open(os.path.join(os.getcwd(),"tests/test.jpg"), 'rb')})
-    # response.
-    assert response.status_code == 200
+def test_api_post_image_endpoint(post_response_of_v1_image_endpoint_for_test_jpg):
+    assert post_response_of_v1_image_endpoint_for_test_jpg.status_code == 200
