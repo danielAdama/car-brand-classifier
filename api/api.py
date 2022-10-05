@@ -10,10 +10,11 @@ from yolo_detect_images import detectObject
 
 app = Flask(__name__)
 # os.environ['FLASK_DEBUG']="development"
+app.config['FLASK_DEBUG']="development"
 
 
 @app.route("/v1/image", methods=["POST"])
-def detect():
+def detect_image():
 
     if not request.method == "POST":
         return
@@ -21,7 +22,7 @@ def detect():
     if request.files.get("image"):
         image_file = request.files["image"]
         result = detectObject(image_file)
-    return pd.Series(result).to_json()
+        return pd.Series(result).to_json()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Car Classifier Api exposing YOLOv4")
