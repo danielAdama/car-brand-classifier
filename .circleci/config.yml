@@ -36,7 +36,6 @@ jobs:
           name: Run Test
           command: |
             source car_env/bin/activate
-            gunicorn --bind 0.0.0.0:8080 api.api:app
             pytest -v
 
 # Invoke jobs via workflows
