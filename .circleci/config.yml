@@ -4,7 +4,39 @@ version: 2.1
 
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
-jobs:
+jobs: 
+  test:
+    docker:
+      - image: cimg/python:3.10.4
+    steps:
+      - checkout
+
+      # Download and cache dependencies
+      - restore_cache:
+          key: v1-dependencies-{{ checksum "requirements.txt" }}
+      - run:
+          name: Install Dependencies
+          command: |
+            python3 -m venv car_env 
+            source car_env/bin/activate
+            /home/circleci/project/car_env/bin/python3 -m pip install --upgrade pip
+            pip install -r requirements.txt
+      - save_cache:
+          paths:
+          - "./car_env"
+          key: v1-dependencies-{{ checksum "requirements.txt" }}
+
+      # - run:
+      #     name: Run Api code
+      #     command: |
+      #       source car_env/bin/activate
+      #       gunicorn --bind 0.0.0.0:8080 api.api:app
+
+      - run:
+          name: Run Test
+          command: |
+            source car_env/bin/activate
+            pytest -v
   build:
     docker:
       - image: cimg/python:3.10.4
@@ -38,39 +70,6 @@ jobs:
       #       source car_env/bin/activate
       #       pytest -v
 
-  test:
-    docker:
-      - image: cimg/python:3.10.4
-    steps:
-      - checkout
-
-      # Download and cache dependencies
-      - restore_cache:
-          key: v1-dependencies-{{ checksum "requirements.txt" }}
-      - run:
-          name: Install Dependencies
-          command: |
-            python3 -m venv car_env 
-            source car_env/bin/activate
-            /home/circleci/project/car_env/bin/python3 -m pip install --upgrade pip
-            pip install -r requirements.txt
-      - save_cache:
-          paths:
-          - "./car_env"
-          key: v1-dependencies-{{ checksum "requirements.txt" }}
-
-      # - run:
-      #     name: Run Api code
-      #     command: |
-      #       source car_env/bin/activate
-      #       gunicorn --bind 0.0.0.0:8080 api.api:app
-
-      - run:
-          name: Run Test
-          command: |
-            source car_env/bin/activate
-            pytest -v
-
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
@@ -78,5 +77,5 @@ workflows:
     # Inside the workflow, you define the jobs you want to run.
     # build-and-test
     jobs:
-      - test
       - build
+      - test
