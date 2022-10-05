@@ -8,6 +8,7 @@ def scrape_images(basePath):
     
     """Function to download image data from 'https://cars.usnews.com/cars-trucks'
     """
+    
     u_agnt = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36',
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -48,6 +49,5 @@ def scrape_images(basePath):
     print("Done! Downloading")
 
 if __name__ == '__main__':
-    
     BASEPATH = r"C:\Users\DELL\Desktop\programming\computerVision\dataset\car_brand\new_custome"
     scrape_images(basePath=BASEPATH)

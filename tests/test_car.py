@@ -12,8 +12,10 @@ def test_car():
     frame = imutils.resize(frame, 900)
     (height, width) = frame.shape[:2]
     frame = cv2.resize(frame, (width, height))
-    boxes = cd.vehicle_detected(frame)
+    scores, boxes = cd.vehicle_detected(frame)
     actual = np.array(boxes[0], dtype='int32')
     expected = np.array([111, 246, 536, 245], dtype='int32')
     assert len(actual) == 4
     assert np.array_equal(actual, expected) is True
+    assert isinstance(scores[0], str) == True
+    assert float(scores[0].split('%')[0]) == 82.0
