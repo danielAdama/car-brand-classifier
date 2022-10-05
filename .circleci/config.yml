@@ -19,6 +19,7 @@ jobs:
           command: |
             python3 -m venv car_env 
             source car_env/bin/activate
+            /home/circleci/project/car_env/bin/python3 -m pip install --upgrade pip
             pip install -r requirements.txt
       - save_cache:
           paths:
