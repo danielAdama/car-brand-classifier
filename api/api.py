@@ -9,7 +9,6 @@ from yolo_detect_images import detectObject
 
 
 app = Flask(__name__)
-# os.environ['FLASK_DEBUG']="development"
 app.config['FLASK_DEBUG']="development"
 
 
