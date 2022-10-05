@@ -78,7 +78,5 @@ workflows:
     # Inside the workflow, you define the jobs you want to run.
     # build-and-test
     jobs:
+      - test
       - build
-      - test:
-          requires:
-            - build
