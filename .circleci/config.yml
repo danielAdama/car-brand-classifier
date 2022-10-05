@@ -26,16 +26,17 @@ jobs:
           - "./car_env"
           key: v1-dependencies-{{ checksum "requirements.txt" }}
 
-      - run:
-          name: Run Api code
-          command: |
-            source car_env/bin/activate
-            gunicorn --bind 0.0.0.0:8080 api.api:app
+      # - run:
+      #     name: Run Api code
+      #     command: |
+      #       source car_env/bin/activate
+      #       gunicorn --bind 0.0.0.0:8080 api.api:app
 
       - run:
           name: Run Test
           command: |
             source car_env/bin/activate
+            gunicorn --bind 0.0.0.0:8080 api.api:app
             pytest -v
 
 # Invoke jobs via workflows
