@@ -5,3 +5,4 @@ import os
 url = 'http://localhost:8080/v1/image'
 resp = requests.post(url, files={'image': open(os.path.join(os.getcwd(),"tests/test.jpg"), 'rb')})
 print(resp.json())
+print(resp.content_type)
