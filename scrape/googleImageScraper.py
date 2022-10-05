@@ -64,5 +64,5 @@ def scrape_car_images(num_images, data):
             file.write(response.content)
     print(f"Images for '{data}' cars downloaded successfully")
 
-# if __name__ == '__main__':
-#     main()
+if __name__ == '__main__':
+    main()
