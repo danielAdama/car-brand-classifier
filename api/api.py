@@ -1,8 +1,8 @@
 import argparse
 from functools import wraps
-import json
 from flask import Flask, request, jsonify
 import os
+import pandas as pd
 import sys
 import jwt
 sys.path.append(os.getcwd())
@@ -12,7 +12,8 @@ from yolo_detect_images import detectObject
 
 app = Flask(__name__)
 app.config['FLASK_DEBUG']="development"
-app.config['SECRET_KEY']=config['SECRET_KEY']
+app.config['SECRET_KEY']=config.KEYS["SECRET_KEY"]
+app.config['USER_NAME']=config.KEYS["USER_NAME"]
 
 
 def token_required(f):
@@ -24,20 +25,20 @@ def token_required(f):
             token = request.headers[access]
 
         if not token:
-            return jsonify({
+            return {
                 "message": "Authentication Token is missing!",
                 "data": None,
                 "error": "Unauthorized"
-            }, 401)
+            }, 401
         
         try:
             data = jwt.decode(token, app.config['SECRET_KEY'])
         except:
-            return jsonify({
+            return {
                 "message": "Invalid Authentication Token",
                 "data": None,
                 "error": "Unauthorized"
-            })
+            }
 
         return f(*args, **kwargs)
     return decorated
@@ -45,22 +46,41 @@ def token_required(f):
 @app.route("/v1/login", methods=["POST"])
 def login():
     auth = request.json
-    return jsonify({'auth':auth})
-    # if not auth:
-    #     return jsonify({
-    #         "message": "Please provide user details",
-    #         "data": None,
-    #         "error": "Bad request"
-    #     },400)
+    if not auth:
+        return {
+            "message": "Please provide user details",
+            "data": None,
+            "error": "Bad request"
+        },400
     
-    # if
+    if auth['SECRET_KEY'] == app.config['SECRET_KEY'] and auth['USER_NAME'] == app.config['USER_NAME']:
+        # if a user is successfullly loggedin return the token
+        try:
+            token = jwt.encode({'user':app.config["USER_NAME"]}, app.config['SECRET_KEY'])
+            return {
+                "message": "Successfully fetched authentication token",
+                "user": app.config['USER_NAME'],
+                "token":token
+            },200
+        except Exception as e:
+            return {
+                "error":"Something went wrong",
+                "message":str(e)
+            }
+
+
+
 
 @app.route("/v1/image", methods=["POST"])
-@token_required
+# @token_required
 def detect_image():
 
     if not request.method == "POST":
-        return
+        return {
+            "message": "Please provide image",
+            "data": None,
+            "error": "Bad request"
+        },400
     
     if request.files.get("image"):
         image_file = request.files["image"]
