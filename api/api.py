@@ -53,7 +53,7 @@ def login():
             "error": "Bad request"
         },400
     
-    if auth['SECRET_KEY'] == app.config['SECRET_KEY'] and auth['USER_NAME'] == app.config['USER_NAME']:
+    if auth['password'] == app.config['SECRET_KEY'] and auth['username'] == app.config['USER_NAME']:
         # if a user is successfullly loggedin return the token
         try:
             token = jwt.encode({'user':app.config["USER_NAME"]}, app.config['SECRET_KEY'])
@@ -66,7 +66,12 @@ def login():
             return {
                 "error":"Something went wrong",
                 "message":str(e)
-            }
+            },500
+    return {
+        "message": "Error fetching authentication token!, invalid username or password",
+        "data": None,
+        "error": "Unauthorized"
+    },404
 
 
 
