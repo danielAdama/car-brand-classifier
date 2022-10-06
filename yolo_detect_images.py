@@ -25,8 +25,8 @@ def detectObject(image_file):
     output = {}
 
     if len(boxes) > 0:
-        output['detections'] = {}
-        output['detections']['prediction'] = []
+        # output['detections'] = {}
+        output['prediction'] = []
         for score, box in zip(scores, boxes):
             detection = {}
             x, y, w, h = box
@@ -38,8 +38,8 @@ def detectObject(image_file):
             detection['Y'] = y
             detection['Width'] = w
             detection['Height'] = h
-            output['detections']['prediction'].append(detection)
+            output['prediction'].append(detection)
     else:
-        output['detections'] = "No Car detected"
+        output['prediction'] = "No Car detected"
 
     return output
