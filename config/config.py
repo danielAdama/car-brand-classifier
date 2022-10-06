@@ -1,7 +1,11 @@
 import os 
 import cv2
 
-SECRET_KEY = 'summer_123.'
+KEYS = {
+    "USER_NAME":"admin",
+    "SECRET_KEY":"summer_123."
+}
+
 EXAMPLE_IMGS = r'C:/Users/Dell/Desktop/programming/computerVision/car-brand-classifier/examples'
 VIDEO = 'Traffic.mp4'
 BASEPATH = r'C:\Users\DELL\Desktop\programming\computerVision\car-brand-classifier'
