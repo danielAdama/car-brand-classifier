@@ -4,6 +4,7 @@ from flask import Flask, request, jsonify
 import os
 import pandas as pd
 import sys
+import json
 import jwt
 sys.path.append(os.getcwd())
 from config import config
@@ -32,7 +33,11 @@ def token_required(f):
             }, 401
         
         try:
-            data = jwt.decode(token, app.config['SECRET_KEY'])
+            data = jwt.decode(
+                token, 
+                app.config['SECRET_KEY'], 
+                algorithms=["HS512"]
+            )
         except:
             return {
                 "message": "Invalid Authentication Token",
@@ -45,33 +50,44 @@ def token_required(f):
 
 @app.route("/v1/login", methods=["POST"])
 def login():
-    auth = request.json
-    if not auth:
+    try:
+        auth = request.json
+        if not auth:
+            return {
+                "message": "Please provide user details",
+                "data": None,
+                "error": "Bad request"
+            },400
+        
+        if auth['password'] == app.config['SECRET_KEY'] and auth['username'] == app.config['USER_NAME']:
+            # if a user is successfullly loggedin return the token
+            try:
+                token = jwt.encode(
+                    {'user':app.config["USER_NAME"]}, 
+                    app.config['SECRET_KEY'], 
+                    algorithm="HS512"
+                )
+                return {
+                    "message": "Successfully fetched authentication token",
+                    "user": app.config['USER_NAME'],
+                    "token":token
+                },200
+            except Exception as e:
+                return {
+                    "error":"Something went wrong",
+                    "message":str(e)
+                },500
         return {
-            "message": "Please provide user details",
+            "message": "Error fetching authentication token! invalid username or password",
             "data": None,
-            "error": "Bad request"
-        },400
-    
-    if auth['password'] == app.config['SECRET_KEY'] and auth['username'] == app.config['USER_NAME']:
-        # if a user is successfullly loggedin return the token
-        try:
-            token = jwt.encode({'user':app.config["USER_NAME"]}, app.config['SECRET_KEY'])
-            return {
-                "message": "Successfully fetched authentication token",
-                "user": app.config['USER_NAME'],
-                "token":token
-            },200
-        except Exception as e:
-            return {
-                "error":"Something went wrong",
-                "message":str(e)
-            },500
-    return {
-        "message": "Error fetching authentication token!, invalid username or password",
-        "data": None,
-        "error": "Unauthorized"
-    },404
+            "error": "Unauthorized"
+        },404
+    except Exception as e:
+        return {
+            "error":"Something went wrong",
+            "message":str(e),
+            "data":None
+        },500
 
 
 
@@ -79,18 +95,42 @@ def login():
 @app.route("/v1/image", methods=["POST"])
 # @token_required
 def detect_image():
-
-    if not request.method == "POST":
+    try:
+        if not request.method == "POST":
+            return {
+                "message": "Please provide an image",
+                "data": None,
+                "error": "Bad request"
+            },400
+        
+        if request.files.get("image"):
+            # Do the following when an image is found
+            try:
+                image_file = request.files["image"]
+                result = detectObject(image_file)
+                return {
+                    "detections":json.loads(pd.Series(result).to_json()),
+                    "messsage":"Successfully processed image"
+                },200
+            except Exception as e:
+                return {
+                    "error":"Something went wrong",
+                    "message":str(e)
+                },500
         return {
-            "message": "Please provide image",
+            "message": "Error processing image! No image parsed",
             "data": None,
-            "error": "Bad request"
-        },400
-    
-    if request.files.get("image"):
-        image_file = request.files["image"]
-        result = detectObject(image_file)
-        return pd.Series(result).to_json()
+        },404
+
+    except Exception as e:
+        return{
+            "error":"Something went wrong",
+            "message":str(e),
+            "data":None
+        },500
+
+
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Car Classifier Api exposing YOLOv4")
