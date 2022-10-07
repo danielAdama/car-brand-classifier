@@ -3,9 +3,9 @@ from functools import wraps
 from flask import Flask, request, jsonify
 import os
 import pandas as pd
-import sys
 import json
 import jwt
+import sys
 sys.path.append(os.getcwd())
 from config import config
 from yolo_detect_images import detectObject
@@ -18,7 +18,7 @@ app.config['USER_NAME']=config.KEYS["USER_NAME"]
 
 
 def token_required(f):
-    @wraps
+    @wraps(f)
     def decorated(*args, **kwargs):
         token = None
         access = 'access-token'
@@ -30,7 +30,7 @@ def token_required(f):
                 "message": "Authentication Token is missing!",
                 "data": None,
                 "error": "Unauthorized"
-            }, 401
+            }, config.HTTP_403_UNAUTHORIZED
         
         try:
             data = jwt.decode(
@@ -43,7 +43,7 @@ def token_required(f):
                 "message": "Invalid Authentication Token",
                 "data": None,
                 "error": "Unauthorized"
-            }
+            }, config.HTTP_500_INTERNAL_SERVER_ERROR
 
         return f(*args, **kwargs)
     return decorated
@@ -51,15 +51,17 @@ def token_required(f):
 @app.route("/v1/login", methods=["POST"])
 def login():
     try:
-        auth = request.json
+        # auth = request.json
+        auth = request.authorization
         if not auth:
             return {
                 "message": "Please provide user details",
                 "data": None,
                 "error": "Bad request"
-            },400
+            }, config.HTTP_400_BAD_REQUEST
         
-        if auth['password'] == app.config['SECRET_KEY'] and auth['username'] == app.config['USER_NAME']:
+        # if auth['password'] == app.config['SECRET_KEY'] and auth['username'] == app.config['USER_NAME']:
+        if auth.password == app.config['SECRET_KEY'] and auth.username == app.config['USER_NAME']:
             # if a user is successfullly loggedin return the token
             try:
                 token = jwt.encode(
@@ -71,64 +73,64 @@ def login():
                     "message": "Successfully fetched authentication token",
                     "user": app.config['USER_NAME'],
                     "token":token
-                },200
+                }, config.HTTP_200_OK
+
             except Exception as e:
                 return {
                     "error":"Something went wrong",
                     "message":str(e)
-                },500
+                }, config.HTTP_500_INTERNAL_SERVER_ERROR
         return {
             "message": "Error fetching authentication token! invalid username or password",
             "data": None,
             "error": "Unauthorized"
-        },404
+        }, config.HTTP_404_NOT_FOUND
     except Exception as e:
         return {
             "error":"Something went wrong",
             "message":str(e),
             "data":None
-        },500
+        }, config.HTTP_500_INTERNAL_SERVER_ERROR
 
 
 
 
 @app.route("/v1/image", methods=["POST"])
-# @token_required
+@token_required
 def detect_image():
     try:
-        if not request.method == "POST":
-            return {
-                "message": "Please provide an image",
-                "data": None,
-                "error": "Bad request"
-            },400
-        
         if request.files.get("image"):
-            # Do the following when an image is found
             try:
                 image_file = request.files["image"]
+                if not image_file:
+                    return {
+                        "message": "Please provide an image",
+                        "data": None,
+                        "error": "Bad request"
+                    }, config.HTTP_400_BAD_REQUEST
+
                 result = detectObject(image_file)
+                result = pd.Series(result).to_json()
                 return {
-                    "detections":json.loads(pd.Series(result).to_json()),
+                    "detections":json.loads(result),
                     "messsage":"Successfully processed image"
-                },200
+                }, config.HTTP_200_OK
             except Exception as e:
                 return {
                     "error":"Something went wrong",
                     "message":str(e)
-                },500
+                }, config.HTTP_500_INTERNAL_SERVER_ERROR
         return {
             "message": "Error processing image! No image parsed",
             "data": None,
-        },404
+        }, config.HTTP_404_NOT_FOUND
 
     except Exception as e:
         return{
             "error":"Something went wrong",
             "message":str(e),
             "data":None
-        },500
-
+        }, config.HTTP_500_INTERNAL_SERVER_ERROR
 
 
 
