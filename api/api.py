@@ -16,7 +16,6 @@ app.config['FLASK_DEBUG']="development"
 app.config['SECRET_KEY']=config.KEYS["SECRET_KEY"]
 app.config['USER_NAME']=config.KEYS["USER_NAME"]
 
-
 def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -92,9 +91,6 @@ def login():
             "data":None
         }, config.HTTP_500_INTERNAL_SERVER_ERROR
 
-
-
-
 @app.route("/v1/image", methods=["POST"])
 @token_required
 def detect_image():
@@ -131,8 +127,6 @@ def detect_image():
             "message":str(e),
             "data":None
         }, config.HTTP_500_INTERNAL_SERVER_ERROR
-
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Car Classifier Api exposing YOLOv4")
